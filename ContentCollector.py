@@ -4,9 +4,9 @@
 import urllib2
 from bs4 import BeautifulSoup
 import re
+import sys
 
-import YandexXMLSearch
-import GoogleAPISearch
+import YandexXML
 import FileUtils
 import ErrTransl
 import config
@@ -51,9 +51,14 @@ def collect_content_from_url(a_arr_data):
         soup = BeautifulSoup(urlResponsContent, 'lxml')
         # strResponsContent = soup.findAll(text=True)
 
-        strFilePath = "data\\" + str(page.m_nID) + ".json"
+	strFilePath = "" 
+	if sys.platform.startswith('win'):	
+		strFilePath = "data\\"
+	else:
+		strFilePath = "./data/"
+        strFilePath = strFilePath + str(page.m_nID) + ".json"
         dataPage = FileUtils.getDataFromFile(strFilePath)
-        dataPage = YandexXMLSearch.WebPage().deserialize(dataPage)
+        dataPage = YandexXML.WebPage().deserialize(dataPage)
 
         strTextContentOnly = getTextContent(dataPage.m_strURL, soup, config.c_arr_str_Reliable_URL)
 
@@ -62,20 +67,19 @@ def collect_content_from_url(a_arr_data):
 
 
 if __name__ == '__main__':
-    # arrYandexResults = YandexXMLSearch.search_yandex("питон")
-    # if len(arrYandexResults) == 0:
-    #     print "Error: Result list is empty."
-    #     exit(0)
-    # print "Search result: " + str(len(arrYandexResults)) + " web pages"
-    # for result in arrYandexResults:
-    #     FileUtils.setData2File(result.serialize(), "data\\Yandex\\" + str(result.m_nID) + ".json")
-    # collect_content_from_url(arrYandexResults)
-
-    arrGoogleResults = GoogleAPISearch.search_google("питон")
-    if len(arrGoogleResults) == 0:
+    arrYandexResults = YandexXML.search_yandex("питон")
+    if len(arrYandexResults) == 0:
         print "Error: Result list is empty."
         exit(0)
-    print "Search result: " + str(len(arrGoogleResults)) + " web pages"
-    for result in arrGoogleResults:
-        FileUtils.setData2File(result.serialize(), "data\\" + str(result.m_nID) + ".json")
-    collect_content_from_url(arrGoogleResults)
+    print "Search result: " + str(len(arrYandexResults)) + " web pages"
+    
+    strFilePath = "" 
+    if sys.platform.startswith('win'):	
+	strFilePath = "data\\"
+    else:
+	strFilePath = "./data/"
+
+    for result in arrYandexResults:
+    	strFullPath = strFilePath + str(result.m_nID) + ".json"
+        FileUtils.setData2File(result.serialize(), strFullPath)
+    collect_content_from_url(arrYandexResults)

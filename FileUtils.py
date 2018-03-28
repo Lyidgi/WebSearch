@@ -11,6 +11,7 @@ import json
 def createFile(a_str_path):
     if not os.path.exists(os.path.dirname(a_str_path)):
         try:
+	    print "Path ",a_str_path
             os.makedirs(os.path.dirname(a_str_path))
         except OSError as exc:  # Guard against race condition
             if exc.errno != errno.EEXIST:
